@@ -8,7 +8,7 @@ import net from 'net';
 import { ScryptedRuntime } from './runtime';
 import level from './level';
 import { Plugin, ScryptedUser, Settings } from './db-types';
-import { SCRYPTED_DEBUG_PORT, SCRYPTED_INSECURE_PORT, SCRYPTED_SECURE_PORT } from './server-settings';
+import { SCRYPTED_DEBUG_PORT, SCRYPTED_INSECURE_PORT, SCRYPTED_SECURE_PORT, SCRYPTED_IP_ADDRESS } from './server-settings';
 import crypto from 'crypto';
 import cookieParser from 'cookie-parser';
 import axios from 'axios';
@@ -38,8 +38,12 @@ process.on('unhandledRejection', error => {
     console.warn('unhandled rejection of RPC Result', error);
 });
 
-function listenServerPort(env: string, port: number, server: any) {
-    server.listen(port,);
+function listenServerPort(env: string, port: number, server: net.Server) {
+    if (SCRYPTED_IP_ADDRESS)
+        server.listen(port, SCRYPTED_IP_ADDRESS);
+    else
+        server.listen(port,);
+    
     server.on('error', (e: Error) => {
         console.error(`Failed to listen on port ${port}. It may be in use.`);
         console.error(`Use the environment variable ${env} to change the port.`);
